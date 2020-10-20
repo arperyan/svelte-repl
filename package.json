@@ -1,0 +1,35 @@
+{
+  "name": "svelte-repl",
+  "private": true,
+  "version": "0.0.1",
+  "license": "MIT",
+  "devDependencies": {
+    "@mdi/js": "^5.7.55",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.2.1",
+    "cross-env": "^5.2.0",
+    "css-loader": "^2.1.1",
+    "file-loader": "^6.1.1",
+    "gh-pages": "^3.1.0",
+    "mini-css-extract-plugin": "^0.6.0",
+    "monaco-editor": "^0.21.2",
+    "monaco-editor-webpack-plugin": "^2.0.0",
+    "rollup": "^2.32.0",
+    "sass": "^1.27.0",
+    "serve": "^11.3.2",
+    "split.js": "^1.6.2",
+    "svelte": "^3.29.0",
+    "svelte-loader": "2.13.3",
+    "svelte-materialify": "^0.1.12",
+    "svelte-preprocess": "^4.5.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.3.1"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "dev": "webpack-dev-server --content-base dist",
+    "serve": "serve dist",
+    "pages": "npm run build && node publish.js"
+  }
+}

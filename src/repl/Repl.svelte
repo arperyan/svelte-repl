@@ -1,8 +1,7 @@
 <script>
-  import Split from 'split.js';
-  import { onMount } from 'svelte';
   import Input from './Input.svelte';
   import Output from './Output.svelte';
+  import { Divider } from 'svelte-materialify/src';
 
   export let components;
 
@@ -19,24 +18,12 @@
   }
 
   $: compile(components);
-
-  onMount(() => {
-    Split(['#input-section', '#output-section'], {
-      elementStyle: (dimension, size, gutter) => ({
-        'flex-basis': `calc(${size}% - ${gutter}px)`,
-      }),
-      gutterStyle: (dimension, gutter) => ({
-        'flex-basis': `${gutter}px`,
-      }),
-      gutterSize: 4,
-    });
-  });
 </script>
 
 <style>
-  :global(.gutter) {
-    cursor: ew-resize;
-    background-color: var(--theme-dividers);
+  #input-section,
+  #output-section {
+    flex-basis: 50%;
   }
 </style>
 
@@ -44,6 +31,7 @@
   <div class="d-flex flex-column" id="input-section">
     <Input bind:components />
   </div>
+  <Divider vertical />
   <div id="output-section">
     <Output {compiled} />
   </div>

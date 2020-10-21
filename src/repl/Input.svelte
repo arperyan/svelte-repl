@@ -1,7 +1,10 @@
 <script>
   import * as monaco from 'monaco-editor';
   import uid from 'uid';
-  import { Tabs, Tab } from 'svelte-materialify/src';
+  import { mdiPlus } from '@mdi/js';
+  import { SlideGroup, Button, Icon } from 'svelte-materialify/src';
+  import Tab from './components/Tab.svelte';
+  import { theme } from '../App.svelte';
   import { onMount } from 'svelte';
 
   export let components = [];
@@ -14,58 +17,88 @@
   // This is the index of the active component in `components`
   $: currentComponent = components.findIndex(({ id }) => id === currentID[0]);
 
-  function changeComponent() {}
-
-  function newComponent() {
-    const id = uid();
-
-    components = components.concat({
-      id,
-      name: `Component${id}`,
-      type: 'svelte',
-      source: '',
-    });
-
-    currentID = [id];
-  }
+  const languages = { svelte: 'html', js: 'javascript' };
 
   onMount(() => {
+    components.forEach(({ id, source, type }) => {
+      models.set(id, monaco.editor.createModel(source, languages[type]));
+    });
+
     editor = monaco.editor.create(document.getElementById('editor'), {
+      model: models.get(currentID[0]),
       automaticLayout: true,
       fontFamily: 'Fira Code',
       fontWeight: '500',
       fontLigatures: true,
       lineNumbersMinChars: 3,
+      tabSize: 2,
+      autoClosingBrackets: true,
+      scrollbar: {
+        vertical: false,
+      },
       minimap: {
         enabled: false,
       },
     });
 
     editor.onDidChangeModelContent(() => {
-      components[currentComponent].source =  models.get(currentID[0]).getValue();
+      components[currentComponent].source = models.get(currentID[0]).getValue();
     });
 
-    components.forEach(({ id, source, language }) => {
-      models.set(id, monaco.editor.createModel(source, 'html'));
+    theme.subscribe((v) => {
+      editor.updateOptions({
+        theme: v === 'light' ? 'vs' : 'vs-dark',
+      });
     });
-
-    editor.setModel(models.get(currentID[0]));
   });
+
+  function changeComponent() {
+    editor.setModel(models.get(currentID[0]));
+  }
+
+  function newComponent() {
+    const id = uid();
+
+    components = components.concat({
+      id,
+      name: `Component${components.length}`,
+      type: 'svelte',
+      source: '',
+    });
+
+    models.set(id, monaco.editor.createModel('', 'html'));
+
+    currentID = [id];
+  }
+
+  function closeComponent({ detail }) {
+    models.get(detail).dispose();
+    models.delete(detail);
+    const index = components.findIndex(({ id }) => id === detail);
+    components.splice(index, 1);
+    components = components;
+    currentID = [components[index - 1].id];
+  }
+
+  function changeType({ detail }) {
+    monaco.editor.setModelLanguage(models.get(detail.id), languages[detail.type]);
+  }
 </script>
 
 <style>
   #editor {
-    margin-top: 8px;
+    margin-top: 4px;
     width: 100%;
     height: 100%;
   }
 </style>
 
-<Tabs bind:value={currentID} on:change={changeComponent}>
-  <div slot="tabs">
-    {#each components as { name, type, id }}
-      <Tab value={id}><span>{name}</span>.<span>{type}</span></Tab>
-    {/each}
-  </div>
-</Tabs>
+<SlideGroup mandatory bind:value={currentID} on:change={changeComponent}>
+  {#each components as { name, type, id }}
+    <Tab on:close={closeComponent} on:changeType={changeType} {id} bind:name bind:type />
+  {/each}
+  <Button on:click={newComponent} class="align-self-center mt-1" size="small" fab text>
+    <Icon path={mdiPlus} />
+  </Button>
+</SlideGroup>
 <div id="editor" />

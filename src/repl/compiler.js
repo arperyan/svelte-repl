@@ -2,7 +2,7 @@ import * as rollup from 'rollup/dist/es/rollup.browser';
 
 // you could use unpkg like the official repl, i thought i'd try out jsdelivr
 const CDN_URL = 'https://unpkg.com/';
-importScripts(`${CDN_URL}/svelte/compiler.js`);
+importScripts(`${CDN_URL}svelte/compiler.js`);
 
 const componentLookup = new Map();
 
